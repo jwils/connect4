@@ -64,18 +64,39 @@ func (c *ConnectFourBoard) Print() {
 	for i := 0; i < 6; i++ {
 		for col := 0; col <= 6; col++ {
 			if c.height[col] > uint8(5-i) {
+				playerMove := -1
 				if (c.playerBoard[0]>>uint(col*7+(5-i)))&1 > 0 {
-					fmt.Printf("B ")
+					playerMove = 0
 				} else if (c.playerBoard[1]>>uint(col*7+(5-i)))&1 > 0 {
-					fmt.Printf("P ")
-				} else {
-					fmt.Printf("ER")
+					playerMove = 1
 				}
+				c.printSquare(playerMove)
 			} else {
 				fmt.Printf("  ")
 			}
 		}
 		fmt.Printf("\n")
+	}
+}
+
+func (c *ConnectFourBoard) printSquare(player int) {
+	switch player {
+	case 0:
+		fmt.Printf("\x1B")
+		fmt.Printf("[31m")
+		fmt.Print("0 ")
+		fmt.Printf("\033")
+		fmt.Printf("[0m")
+		break
+	case 1:
+		fmt.Printf("\x1B")
+		fmt.Printf("[33m")
+		fmt.Print("0 ")
+		fmt.Printf("\033")
+		fmt.Printf("[0m")
+		break
+	default:
+		fmt.Printf("ER")
 	}
 }
 
