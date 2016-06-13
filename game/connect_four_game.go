@@ -18,11 +18,11 @@ type ConnectFourBoard struct {
 	playerBoard [2]uint64
 	height      [7]uint8
 	moves       [Width * Height]uint8
-	printer      BoardPrinter
+	printer     BoardPrinter
 }
 
 func NewGame(p1, p2 Player) ConnectFourGame {
-	return ConnectFourGame{ConnectFourBoard{printer:ColorizedBoardPrinter{}}, p1, p2}
+	return ConnectFourGame{ConnectFourBoard{printer: ColorizedBoardPrinter{}}, p1, p2}
 }
 
 func (c *ConnectFourBoard) String() {

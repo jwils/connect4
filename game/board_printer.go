@@ -10,9 +10,7 @@ type BoardPrinter interface {
 	PrintFooter()
 }
 
-
 type ColorizedBoardPrinter struct {
-
 }
 
 func (c ColorizedBoardPrinter) PrintHeader() {
@@ -20,24 +18,30 @@ func (c ColorizedBoardPrinter) PrintHeader() {
 	fmt.Printf(" ______________\n")
 }
 
+func (c ColorizedBoardPrinter) changeColor(color string) {
+	fmt.Printf("\x1B")
+	fmt.Printf("[%sm", color)
+}
+
+func (c ColorizedBoardPrinter) clearColor() {
+	fmt.Printf("\033")
+	fmt.Printf("[0m")
+}
+
 func (c ColorizedBoardPrinter) PrintSquare(player int) {
 	switch player {
 	case 0:
-	fmt.Printf("\x1B")
-	fmt.Printf("[31m")
-	fmt.Print("0 ")
-	fmt.Printf("\033")
-	fmt.Printf("[0m")
-	break
+		c.changeColor("31")
+		fmt.Print("0 ")
+		c.clearColor()
+		break
 	case 1:
-	fmt.Printf("\x1B")
-	fmt.Printf("[33m")
-	fmt.Print("0 ")
-	fmt.Printf("\033")
-	fmt.Printf("[0m")
-	break
+		c.changeColor("33")
+		fmt.Print("0 ")
+		c.clearColor()
+		break
 	default:
-	fmt.Printf("  ")
+		fmt.Printf("  ")
 	}
 
 }
@@ -47,7 +51,6 @@ func (c ColorizedBoardPrinter) BeginRow() {
 }
 
 func (c ColorizedBoardPrinter) EndRow() {
-
 	fmt.Print("|\n")
 }
 
