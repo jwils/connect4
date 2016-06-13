@@ -30,15 +30,29 @@ type HumanPlayer struct {
 func (h HumanPlayer) Move(b ConnectFourBoard) uint8 {
 	b.String()
 
+	var m uint8
 	fmt.Print("Enter move: ")
-	move, e := h.Reader.ReadString('\n')
-	if e != nil {
-		panic(e)
-	}
+	for move, e := h.Reader.ReadString('\n'); true; move, e = h.Reader.ReadString('\n') {
+		if e != nil {
+			fmt.Print("\nError reading input. Please try again.\n")
+			fmt.Print("Enter move: ")
+			continue
+		}
 
-	imove, e2 := strconv.Atoi(strings.TrimSpace(move))
-	if e2 != nil {
-		panic(e2)
+		imove, e2 := strconv.Atoi(strings.TrimSpace(move))
+		if e2 != nil {
+			fmt.Print("\nMove could not be parsed into an int. Please try agian.\n")
+			fmt.Print("Enter move: ")
+			continue
+		}
+		if imove < 0 || imove > Width - 1 {
+			fmt.Printf("\nMove out of range. Must be between 0 and %v\n", Width - 1)
+			fmt.Print("Enter move: ")
+			continue
+
+		}
+		m = uint8(imove)
+		break
 	}
-	return uint8(imove)
+	return m
 }
