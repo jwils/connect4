@@ -18,52 +18,30 @@ type ConnectFourBoard struct {
 	playerBoard [2]uint64
 	height      [7]uint8
 	moves       [Width * Height]uint8
+	printer      BoardPrinter
 }
 
 func NewGame(p1, p2 Player) ConnectFourGame {
-	return ConnectFourGame{ConnectFourBoard{}, p1, p2}
+	return ConnectFourGame{ConnectFourBoard{printer:ColorizedBoardPrinter{}}, p1, p2}
 }
 
 func (c *ConnectFourBoard) String() {
-	fmt.Printf(" 0 1 2 3 4 5 6\n")
-	fmt.Printf(" ______________\n")
+	c.printer.PrintHeader()
 	for i := 0; i < 6; i++ {
-		fmt.Printf("|")
+		c.printer.BeginRow()
 		for col := 0; col <= 6; col++ {
 			if c.height[col] > uint8(5-i) {
 				player0 := (c.playerBoard[0] >> uint(col*7+(5-i))) & 1
 				player1 := (c.playerBoard[1] >> uint(col*7+(5-i))) & 1
 				playerMove := player0 + player1<<1
-				c.printSquare(int(playerMove) - 1)
+				c.printer.PrintSquare(int(playerMove) - 1)
 			} else {
-				fmt.Printf("  ")
+				c.printer.PrintSquare(-1)
 			}
 		}
-		fmt.Printf("|\n")
+		c.printer.EndRow()
 	}
-	fmt.Printf(" ______________\n")
-	fmt.Print("\n")
-}
-
-func (c *ConnectFourBoard) printSquare(player int) {
-	switch player {
-	case 0:
-		fmt.Printf("\x1B")
-		fmt.Printf("[31m")
-		fmt.Print("0 ")
-		fmt.Printf("\033")
-		fmt.Printf("[0m")
-		break
-	case 1:
-		fmt.Printf("\x1B")
-		fmt.Printf("[33m")
-		fmt.Print("0 ")
-		fmt.Printf("\033")
-		fmt.Printf("[0m")
-		break
-	default:
-		fmt.Printf("ER")
-	}
+	c.printer.PrintFooter()
 }
 
 type ConnectFourGame struct {
