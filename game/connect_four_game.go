@@ -1,56 +1,18 @@
-package main
+package game
 
 import (
-	"bufio"
 	"fmt"
-	"math/rand"
-	"os"
-	"strconv"
-	"strings"
 )
 
 const (
 	Width  = 7
 	Height = 6
-
-	Player1 = 0
-	Player2 = 1
 )
 
-type Player interface {
-	Move(ConnectFourBoard) uint8
-}
-
-type RandomPlayer struct {
-}
-
-func (r RandomPlayer) Move(b ConnectFourBoard) uint8 {
-	m := rand.Intn(Height)
-	for ; !b.validMove(uint8(m)); m = rand.Intn(Height) {
-
-	}
-	return uint8(m)
-}
-
-type HumanPlayer struct {
-	reader *bufio.Reader
-}
-
-func (h HumanPlayer) Move(b ConnectFourBoard) uint8 {
-	b.Print()
-
-	fmt.Print("Enter move: ")
-	move, e := h.reader.ReadString('\n')
-	if e != nil {
-		panic(e)
-	}
-
-	imove, e2 := strconv.Atoi(strings.TrimSpace(move))
-	if e2 != nil {
-		panic(e2)
-	}
-	return uint8(imove)
-}
+const (
+	Player1 = iota
+	Player2
+)
 
 type ConnectFourBoard struct {
 	playerBoard [2]uint64
@@ -58,25 +20,29 @@ type ConnectFourBoard struct {
 	moves       [Width * Height]uint8
 }
 
-func (c *ConnectFourBoard) Print() {
-	fmt.Printf("0 1 2 3 4 5 6\n")
-	fmt.Printf("--------------\n")
+func NewGame(p1, p2 Player) ConnectFourGame {
+	return ConnectFourGame{ConnectFourBoard{}, p1, p2}
+}
+
+func (c *ConnectFourBoard) String() {
+	fmt.Printf(" 0 1 2 3 4 5 6\n")
+	fmt.Printf(" ______________\n")
 	for i := 0; i < 6; i++ {
+		fmt.Printf("|")
 		for col := 0; col <= 6; col++ {
 			if c.height[col] > uint8(5-i) {
-				playerMove := -1
-				if (c.playerBoard[0]>>uint(col*7+(5-i)))&1 > 0 {
-					playerMove = 0
-				} else if (c.playerBoard[1]>>uint(col*7+(5-i)))&1 > 0 {
-					playerMove = 1
-				}
-				c.printSquare(playerMove)
+				player0 := (c.playerBoard[0] >> uint(col*7+(5-i))) & 1
+				player1 := (c.playerBoard[1] >> uint(col*7+(5-i))) & 1
+				playerMove := player0 + player1<<1
+				c.printSquare(int(playerMove) - 1)
 			} else {
 				fmt.Printf("  ")
 			}
 		}
-		fmt.Printf("\n")
+		fmt.Printf("|\n")
 	}
+	fmt.Printf(" ______________\n")
+	fmt.Print("\n")
 }
 
 func (c *ConnectFourBoard) printSquare(player int) {
@@ -124,9 +90,10 @@ func (c *ConnectFourBoard) validMove(move uint8) bool {
 }
 
 func (c *ConnectFourGame) GetPlayer(player int) Player {
-	if player == Player1 {
+	switch player {
+	case Player1:
 		return c.p1
-	} else if player == Player2 {
+	case Player2:
 		return c.p2
 	}
 	panic("Unknown Player")
@@ -144,7 +111,6 @@ func (c *ConnectFourGame) Move(player int) {
 }
 
 func (c *ConnectFourGame) Play() {
-
 	c.board.playerBoard[0] = 0
 	c.board.playerBoard[1] = 0
 	for i, _ := range c.board.height {
@@ -152,24 +118,17 @@ func (c *ConnectFourGame) Play() {
 
 	}
 	for {
-
 		c.Move(Player1)
 		if c.board.hasWon(Player1) {
+			c.board.String()
 			fmt.Printf("Player 1 Wins")
 			break
 		}
 		c.Move(Player2)
 		if c.board.hasWon(Player2) {
+			c.board.String()
 			fmt.Printf("Player 2 Wins")
 			break
 		}
 	}
-}
-
-func main() {
-	p1 := RandomPlayer{}
-	p2 := HumanPlayer{}
-	p2.reader = bufio.NewReader(os.Stdin)
-	game := ConnectFourGame{ConnectFourBoard{}, p1, p2}
-	game.Play()
 }
