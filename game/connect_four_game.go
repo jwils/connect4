@@ -67,6 +67,14 @@ func (c *ConnectFourBoard) validMove(move uint8) bool {
 	return move >= 0 && move < Width && c.height[move] < Height
 }
 
+func (b *ConnectFourBoard) setup() {
+	b.playerBoard[Player1] = 0
+	b.playerBoard[Player2] = 0
+	for i, _ := range b.height {
+		b.height[i] = 0
+	}
+}
+
 func (c *ConnectFourGame) GetPlayer(player int) Player {
 	switch player {
 	case Player1:
@@ -88,25 +96,25 @@ func (c *ConnectFourGame) Move(player int) {
 	c.board.height[move]++
 }
 
-func (c *ConnectFourGame) Play() {
-	c.board.playerBoard[0] = 0
-	c.board.playerBoard[1] = 0
-	for i, _ := range c.board.height {
-		c.board.height[i] = 0
+func (c *ConnectFourGame) evalWin(player int) bool {
+	if c.board.hasWon(player) {
+		c.board.String()
+		fmt.Printf("Player %v has won", (player + 1))
+		return false
+	}
+	return true
+}
 
+func (c *ConnectFourGame) Play() {
+	c.board.setup()
+	for currentPlayer := Player1; c.evalWin(currentPlayer); currentPlayer = switchPlayer(currentPlayer) {
+		c.Move(currentPlayer)
 	}
-	for {
-		c.Move(Player1)
-		if c.board.hasWon(Player1) {
-			c.board.String()
-			fmt.Printf("Player 1 Wins")
-			break
-		}
-		c.Move(Player2)
-		if c.board.hasWon(Player2) {
-			c.board.String()
-			fmt.Printf("Player 2 Wins")
-			break
-		}
+}
+
+func switchPlayer(p int) int {
+	if p == Player1 {
+		return Player2
 	}
+	return Player1
 }
