@@ -1,15 +1,13 @@
 package main
 
 import (
-	"bufio"
 	"github.com/jwils/connect4/game"
-	"os"
+	"github.com/jwils/connect4/players"
 )
 
 func main() {
-	p1 := game.RandomPlayer{}
-	p2 := game.HumanPlayer{}
-	p2.Reader = bufio.NewReader(os.Stdin)
+	p1 := players.NegamaxPlayer{}
+	p2 := players.AlphaBetaPlayer{}
 	game := game.NewGame(p1, p2)
 	game.Play()
 }
